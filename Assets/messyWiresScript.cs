@@ -330,6 +330,18 @@ public class messyWiresScript : MonoBehaviour
             for (int i = 1; i < parts.Length; i++)
             {
                 string colorName = ConvertToColor(parts[i]);
+
+                if (!wireSelectables.Any(w => colorName == wireColourName[Array.IndexOf(wholeWires, w.gameObject)]))
+                {
+                    yield return "sendtochaterror The color, " + colorName + ", isn't on the module!";
+                    yield return "unsubmittablepenalty";
+                    yield break;
+                }
+            }
+            for (int i = 1; i < parts.Length; i++)
+            {
+                string colorName = ConvertToColor(parts[i]);
+
                 foreach (KMSelectable wire in wireSelectables.Where(w => colorName == wireColourName[Array.IndexOf(wholeWires, w.gameObject)]))
                 {
                     OnWireCut(wire);
