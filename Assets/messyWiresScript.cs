@@ -316,4 +316,61 @@ public class messyWiresScript : MonoBehaviour
             Debug.LogFormat("[Wire Spaghetti #{0}] Module disarmed.", moduleId);
         }
     }
+
+    private string TwitchHelpMessage = @"Use '!{0} cut p l dr w g o b y lr k dg i a r lg' to cut the wires in that order. Valid colors are Purple, Lime, DarkRed, White, Green, Orange, Blue, Yellow, LightRed, blacK, DarkGrey, pInk, Aqua, bRown, and LightGrey.";
+
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        var parts = command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length > 1 && parts[0] == "cut" && parts.Skip(1).All(part => (part.Length == 1 && ("plwgobykiar".Contains(part)) || part.Length == 2 && new[] {"dr","lr","dg","lg" }.Any(ix => part == ix))))
+        {
+            yield return null;
+
+            for (int i = 1; i < parts.Length; i++)
+            {
+                string colorName = ConvertToColor(parts[i]);
+
+                if (!wireSelectables.Any(w => colorName == wireColourName[Array.IndexOf(wholeWires, w.gameObject)]))
+                {
+                    yield return "sendtochaterror The color, " + colorName + ", isn't on the module!";
+                    yield return "unsubmittablepenalty";
+                    yield break;
+                }
+            }
+            for (int i = 1; i < parts.Length; i++)
+            {
+                string colorName = ConvertToColor(parts[i]);
+
+                foreach (KMSelectable wire in wireSelectables.Where(w => colorName == wireColourName[Array.IndexOf(wholeWires, w.gameObject)]))
+                {
+                    OnWireCut(wire);
+                    yield return new WaitForSeconds(.1f);
+                }
+            }
+        }
+    }
+
+    private string ConvertToColor(string color)
+    {
+        string conversion;
+
+        if (color == "p") { conversion = "purple"; }
+        else if (color == "l") { conversion = "lime"; }
+        else if (color == "dr") { conversion = "dark red"; }
+        else if (color == "w") { conversion = "white"; }
+        else if (color == "g") { conversion = "green"; }
+        else if (color == "o") { conversion = "orange"; }
+        else if (color == "b") { conversion = "blue"; }
+        else if (color == "y") { conversion = "yellow"; }
+        else if (color == "lr") { conversion = "light red"; }
+        else if (color == "k") { conversion = "black"; }
+        else if (color == "dg") { conversion = "dark grey"; }
+        else if (color == "i") { conversion = "pink"; }
+        else if (color == "a") { conversion = "aqua"; }
+        else if (color == "r") { conversion = "brown"; }
+        else { conversion = "light grey"; }
+
+        return conversion;
+    }
 }
