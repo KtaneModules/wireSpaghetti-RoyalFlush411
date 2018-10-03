@@ -317,13 +317,13 @@ public class messyWiresScript : MonoBehaviour
         }
     }
 
-    private string TwitchHelpMessage = @"Use '!{0} cut p l dr w g o b y lr k dg i a r lg' to cut the wires in that order. Valid colors are Purple, Lime, DarkRed, White, Green, Orange, Blue, Yellow, LightRed, blacK, DarkGrey, pInk, Aqua, bRown, and LightGrey.";
+    private string TwitchHelpMessage = @"Use '!{0} cut p l l dr dr dr' to cut the wires in that order. Valid colors are Purple, Lime, DarkRed, White, Green, Orange, Blue, Yellow, LightRed, blacK, DarkGrey, pInk, Aqua, bRown, and LightGrey.";
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         var parts = command.ToLowerInvariant().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length > 1 && parts[0] == "cut" && parts.Skip(1).All(part => (part.Length == 1 && ("plwgobykiar".Contains(part)) || part.Length == 2 && new[] {"dr","lr","dg","lg" }.Any(ix => part == ix))))
+        if (parts.Length > 1 && parts[0] == "cut" && parts.Skip(1).All(part => (part.Length == 1 && ("plwgobykiar".Contains(part)) || part.Length == 2 && new[] { "dr", "lr", "dg", "lg" }.Any(ix => part == ix))))
         {
             yield return null;
 
@@ -337,15 +337,15 @@ public class messyWiresScript : MonoBehaviour
                     yield return "unsubmittablepenalty";
                     yield break;
                 }
-            }
-            for (int i = 1; i < parts.Length; i++)
-            {
-                string colorName = ConvertToColor(parts[i]);
 
                 foreach (KMSelectable wire in wireSelectables.Where(w => colorName == wireColourName[Array.IndexOf(wholeWires, w.gameObject)]))
                 {
-                    OnWireCut(wire);
-                    yield return new WaitForSeconds(.1f);
+                    if (wire.gameObject.activeInHierarchy == true) // If the wire isn't cut
+                    {
+                        OnWireCut(wire);
+                        yield return new WaitForSeconds(.1f);
+                        break;
+                    }
                 }
             }
         }
